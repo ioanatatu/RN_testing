@@ -1,12 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, { 
+  useAnimatedGestureHandler, 
+  useSharedValue,
+  useAnimatedStyle
+} from 'react-native-reanimated';
+
+import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
+
+const SIZE = 100;
 
 export default function App() {
+  const translateX = useSharedValue(0);
+
+  // provide the pan gesture event property to the PagGestureHandler
+  // useAnimatedGestureHandler = hook that provides callbacks
+  const panGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
+    onStart: (event) => {},
+    onActive: (event) => {
+      // when the pan is active, we need to update the shared value
+      console.log(event.translationX);
+      translateX.value = event.translationX; 
+    },
+    onEnd: (event) => {}
+  })
+
+  const rStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{
+        translateX: translateX.value
+      }]
+    }
+  })
+
+
   return (
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      {/* <PanGestureHandler>  */}
+        <Animated.View style={[styles.square, rStyle]}/>
+      {/* </PanGestureHandler> */}
     </View>
   );
 }
@@ -18,4 +51,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  square: {
+    width: SIZE,
+    height: SIZE,
+    backgroundColor: 'rgba(0, 0, 256, 0.5)',
+    borderRadius: 10
+  }
 });
